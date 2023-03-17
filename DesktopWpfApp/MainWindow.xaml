@@ -1,0 +1,38 @@
+﻿<Window x:Class="DesktopWpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DesktopWpfApp"
+        mc:Ignorable="d"
+         Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="Message"
+                   Text="Sciex OS Desktop Application" Background="DeepSkyBlue"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="24"
+                   FontFamily="Segoe UI Light, San Serif"
+                   TextWrapping="Wrap"/>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">      
+            <TextBlock x:Name="Message1" Grid.Row="1" Width="Auto" Height="Auto" Background="LightSkyBlue"
+                       Text="Api output"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="24"
+                       FontFamily="Segoe UI Light, San Serif"
+                       TextWrapping="Wrap"/>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <CheckBox x:Name="autologin" Margin="50,50,0,0" Width="100" Unchecked="autologin_Checked" Checked="autologin_Checked">Auto Login</CheckBox>
+            <Button Margin="50,0,0,0" Width="100" Height="50" Click="Button_Click_2">Log In</Button>
+            <Button Margin="50,0,0,0" Width="100" Height="50" Click="Button_Click">Log out</Button>
+            <Button Margin="50,0,0,0" Width="100" Height="50" Click="Button_Click_1">CallAPI</Button>
+        </StackPanel>
+    </Grid>
+</Window>

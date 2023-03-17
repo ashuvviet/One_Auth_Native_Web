@@ -1,0 +1,304 @@
+version: '3.4'
+volumes:
+  db_data: {}
+  data: {}
+  keycloak_data: {}
+
+
+networks:
+  microservice-net:
+    driver: bridge
+
+services:
+  api-proxy:
+    container_name: api-proxy
+    image: 'traefik:v2.4'
+    networks:
+      - microservice-net
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - './traefik/configuration/config.yml:/configuration/conf.yml:ro'
+      - './traefik/certs:/certs'
+    command:
+      - '--log.level=DEBUG'
+      - '--api.insecure=true'
+      - '--providers.docker=true'
+      - '--providers.file.directory=/configuration/'
+      - '--providers.file.watch=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443'
+    ports:
+      - 80:80
+      - 443:443
+      - 8090:8080   
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.1.0
+    hostname: zookeeper
+    container_name: zookeeper
+    networks:
+      - microservice-net
+    ports:
+      - '2181:2181'
+    healthcheck: 
+      test: nc -z localhost 2181 || exit -1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-kafka:6.1.0
+    hostname: broker
+    container_name: broker
+    networks:
+      - microservice-net
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck: 
+      test: ["CMD", "nc", "-vz", "localhost", "9092"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    ports:
+      - '29092:29092'
+      - '9092:9092'
+      - '9101:9101'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      
+  # control-center: # this is best Ui from confluent directly but it is Paid, 30 days free
+    # image: confluentinc/cp-enterprise-control-center:7.1.1
+    # hostname: control-center
+    # container_name: control-center
+    # networks:
+      # - microservice-net
+    # depends_on:
+      # - broker
+      # - schema-registry
+    # ports:
+      # - "9021:9021"
+    # environment:
+      # CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
+      # CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      # CONTROL_CENTER_REPLICATION_FACTOR: 1
+      # CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      # CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      # CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      # PORT: 9021
+      
+  # broker-ui: #https://github.com/provectus/kafka-ui {Apache-2.0 license}
+    # container_name: broker-ui
+    # image: provectuslabs/kafka-ui:latest
+    # networks:
+      # - microservice-net
+    # ports:
+      # - 1070:1070
+    # depends_on:
+      # - zookeeper
+      # - broker
+      # - schema-registry
+    # environment:
+      # SERVER_PORT: 1070
+      # KAFKA_CLUSTERS_0_NAME: local
+      # KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
+      # KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      # KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.1.0
+    hostname: schema-registry
+    container_name: schema-registry
+    networks:
+      - microservice-net
+    depends_on:
+      broker:
+        condition: service_healthy
+    ports:
+      - '8081:8081'
+    healthcheck: 
+      test: curl --fail http://localhost:8081/ || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      
+  # schema-registry-ui: #https://github.com/lensesio/schema-registry-ui/tree/master/docker
+    # container_name: schema-registry-ui
+    # image: landoop/schema-registry-ui
+    # ports:
+      # - '1090:1090'
+    # networks:
+      # - microservice-net
+    # depends_on:
+      # - broker
+      # - schema-registry
+    # environment:
+      # PROXY: 'true'
+      # PORT: 1090
+      # SCHEMAREGISTRY_URL: http://schema-registry:8081
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:6.1.0
+    networks:
+      - microservice-net
+    depends_on:
+      - broker
+      - schema-registry
+    ports:
+      - 8082:8082
+    hostname: rest-proxy
+    container_name: rest-proxy
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: 'broker:29092'
+      KAFKA_REST_LISTENERS: 'http://0.0.0.0:8082'
+      KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+
+  mongodatabase:
+    image: mongo
+    container_name: 'mongodatabase'
+    hostname: 'mongodatabase'
+    networks:
+      - microservice-net
+    restart: always
+    healthcheck: 
+      test: echo 'db.runCommand("ping").ok' | mongo mongodatabase:27017/test --quiet
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    volumes:
+       - data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - 27017:27017
+      
+  # mongo-express:
+    # image: mongo-express
+    # container_name: mongo-express
+    # environment:
+       # - ME_CONFIG_MONGODB_SERVER=mongodatabase
+    # volumes:
+       # - data:/data/db
+    # depends_on:
+      # - mongodatabase
+    # networks:
+      # - microservice-net
+    # ports:
+      # - 8085:8081
+
+  mysql:
+    image: mysql/mysql-server:8.0.20
+    container_name: 'mysql'
+    hostname: 'mysql'
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - microservice-net
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./DockerVolumes/mysql/init:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3308:3306
+    expose:
+      - '3306'
+    healthcheck: 
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost" ,"-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  keycloak:
+    image: jboss/keycloak:12.0.4
+    container_name: 'keycloak'
+    hostname: 'keycloak'
+    networks:
+      - microservice-net
+    restart: always
+    command:
+      - -Dkeycloak.profile.feature.upload_scripts=enabled
+    volumes:
+      #- ./microservices/scp-api-authentication/keycloak/realm-platform.json:/tmp/realm-platform.json
+      - ./DockerVolumes/keycloak/realm-platform-mailcatcher.json:/tmp/realm-platform-mailcatcher.json
+      - ./DockerVolumes/keycloak/themes/company:/opt/jboss/keycloak/themes/company
+      - keycloak_data:/opt/jboss/keycloak/standalone/data
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.keycloak.rule=Host(`keycloak.localhost`)'
+      - 'traefik.http.routers.keycloak.entrypoints=websecure'
+      - 'traefik.http.routers.oom-keycloak.tls=true'
+    environment:
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KEYCLOAK_IMPORT: /tmp/realm-platform-mailcatcher.json
+      PROXY_ADDRESS_FORWARDING: 'true'
+      DB_VENDOR: H2
+      #      DB_ADDR: mysql
+      #DB_DATABASE: keycloak
+      #DB_USER: ${MYSQL_USER}
+      #DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_PORT: 3306
+    ports:
+      - 8080:8080
+      - 8443:8443
+      - 9990:9990
+    healthcheck:
+      test: curl --fail http://keycloak:8443/auth/realms/master || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      
+  ldap:
+    container_name: contosoOpenLdap
+    image: osixia/openldap:latest
+    networks:
+      - microservice-net
+    environment:
+      LDAP_ORGANISATION: Contoso Ltd.
+      LDAP_DOMAIN: contoso.com
+      LDAP_ADMIN_PASSWORD: P@ss1W0Rd!
+      LDAP_CONFIG_PASSWORD: P@ss1W0Rd!
+      LDAP_READONLY_USER: true
+      LDAP_READONLY_USER_USERNAME: ldap-ro
+      LDAP_READONLY_USER_PASSWORD: P@ss1W0Rd!
+    volumes:
+      - ./DockerVolumes/ldap:/data/ldif
+    ports:
+      - "389:389"
+      - "636:636"
+      
+  redis:
+    image: redis
+    container_name: cache
+    networks:
+      - microservice-net
+    ports:
+      - "6379:6379"
+

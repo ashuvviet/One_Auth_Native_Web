@@ -1,0 +1,340 @@
+.center-panel {
+  position: relative; left: -50%; float: left;
+
+}
+
+.outer-center-panel {
+  position: relative; left: 50%; float: left;
+  top: 50%;
+transform: translateY(50%);
+
+}
+
+.navbar-inverse.navbar {
+  background-color: #0084AB;
+  color: rgba(255,255,255,.84);
+}
+
+
+.btn-primary:not(.btn-link):not(.btn-flat) {
+  background-color: #004964;
+  color: rgba(255,255,255,.84);
+}
+
+.btn-primary:hover:not(.btn-link):not(.btn-flat) {
+  background-color: #007799;
+}
+
+.navbar-brand>img {
+margin-left: 17px;
+}
+
+h1 {
+position: absolute;
+top: 80px;
+left: 60px;
+color: #0dd4e4;
+}
+
+h3 {
+margin: 10px 0px;
+}
+
+h4 {
+color: #0dd4e4;
+margin-bottom: 5px;
+}
+
+
+hr {
+margin: 0;
+margin-bottom: 5px;
+border-top: 1px solid #72c7ce;
+}
+
+.dropdown-menu .divider {
+  background-color: rgba(229, 229, 229, 0.8);
+}
+
+.col-centered {
+float: none;
+margin: 0 auto;
+}
+
+.alert-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 400px;
+  margin-left: -200px;
+  text-align: center;
+}
+
+.login-container {
+display: flex;
+}
+
+.login-container > div {
+flex: 1;
+}
+
+.login-right {
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.login-chrome-text {
+display: flex;
+align-items: center;
+align-self: flex-end;
+}
+
+.login-chrome-text img {
+margin-right: 10px;
+}
+
+.login-chrome-text p {
+margin: 0;
+}
+
+
+
+
+
+/* Links */
+a,
+a:focus,
+a:hover {
+color: #000EEE;
+}
+
+/*
+* Base structure
+*/
+
+html,
+body {
+height: 100%;
+/* background-color: #004964; */
+ background-color:rgb(238, 238, 238) !important;
+/* background-image: url(background.jpg); */
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+background-position: center;
+}
+
+@media (min-width: 768px) {
+/* Pull out the header and footer */
+.masthead {
+  position: fixed;
+  top: 0;
+}
+.mastfoot {
+  position: fixed;
+  bottom: 0;
+  text-align: center;
+}
+/* Start the vertical centering */
+.site-wrapper-inner {
+  vertical-align: middle;
+}
+/* Handle the widths */
+.masthead,
+.mastfoot,
+.cover-container {
+  width: 100%; /* Must be percentage or pixels for horizontal alignment */
+}
+}
+
+@media (min-width: 992px) {
+.masthead,
+.mastfoot,
+.cover-container {
+  width: 700px;
+}
+}
+
+.mastfoot {
+color: rgba(255,255,255,.7);
+}
+
+.notif-error {
+width: 30% !important;
+background-color: tomato !important;
+color: white !important;
+}
+
+.center-panel {
+  position: relative; left: -50%; float: left;
+
+}
+
+.outer-center-panel {
+  position: relative; left: 50%; float: left;
+  top: 50%;
+transform: translateY(50%);
+
+}
+
+.navbar-inverse.navbar {
+  background-color: #0084AB;
+  color: rgba(255,255,255,.84);
+}
+
+
+.btn-primary:not(.btn-link):not(.btn-flat) {
+  background-color: #004964;
+  color: rgba(255,255,255,.84);
+}
+
+.btn-primary:hover:not(.btn-link):not(.btn-flat) {
+  background-color: #007799;
+}
+
+.navbar-brand>img {
+margin-left: 17px;
+}
+
+h1 {
+position: absolute;
+top: 80px;
+left: 60px;
+color: #0dd4e4;
+}
+
+h3 {
+margin: 10px 0px;
+}
+
+h4 {
+color: #0dd4e4;
+margin-bottom: 5px;
+}
+
+hr {
+margin: 0;
+margin-bottom: 5px;
+border-top: 1px solid #72c7ce;
+}
+
+.dropdown-menu .divider {
+  background-color: rgba(229, 229, 229, 0.8);
+}
+
+.col-centered {
+float: none;
+margin: 0 auto;
+}
+
+.alert-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 400px;
+  margin-left: -200px;
+  text-align: center;
+}
+
+.login-container {
+display: flex;
+}
+
+.login-container > div {
+flex: 1;
+}
+
+.login-right {
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.login-chrome-text {
+display: flex;
+align-items: center;
+align-self: flex-end;
+}
+
+.login-chrome-text img {
+margin-right: 10px;
+}
+
+.login-chrome-text p {
+margin: 0;
+}
+
+
+
+
+
+/* Links */
+a,
+a:focus,
+a:hover {
+color: #fff;
+}
+
+/*
+* Base structure
+*/
+
+html,
+body {
+height: 100%;
+/* background-color: #004964; */
+ background-color:rgb(238, 238, 238) !important;
+/* background-image: url(background.jpg); */
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+background-position: center;
+}
+
+@media (min-width: 768px) {
+/* Pull out the header and footer */
+.masthead {
+  position: fixed;
+  top: 0;
+}
+.mastfoot {
+  position: fixed;
+  bottom: 0;
+  text-align: center;
+}
+/* Start the vertical centering */
+.site-wrapper-inner {
+  vertical-align: middle;
+}
+/* Handle the widths */
+.masthead,
+.mastfoot,
+.cover-container {
+  width: 100%; /* Must be percentage or pixels for horizontal alignment */
+}
+}
+
+@media (min-width: 992px) {
+.masthead,
+.mastfoot,
+.cover-container {
+  width: 700px;
+}
+}
+
+.mastfoot {
+color: rgba(255,255,255,.7);
+}
+
+.notif-error {
+width: 30% !important;
+background-color: tomato !important;
+color: white !important;
+}
+
+.alert-error {
+  background-color: tomato !important;
+}
