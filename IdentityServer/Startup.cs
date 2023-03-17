@@ -140,7 +140,7 @@ namespace IdentityServer
 
             //services.AddOidcStateDataFormatterCache("aad", "demoidsrv");
             services.AddAuthentication()
-               .AddOpenIdConnect("IS4", "Microsoft Azure AD", options =>
+               .AddOpenIdConnect("oidc", "Microsoft Azure AD", options =>
                {
                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                    options.SignOutScheme = IdentityServerConstants.SignoutScheme;
