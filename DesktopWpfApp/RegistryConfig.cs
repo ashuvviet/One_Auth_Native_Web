@@ -33,7 +33,7 @@ namespace DesktopWpfApp
         const string CommandKeyValueName = "";
         const string CommandKeyValueFormat = "\"{0}\" \"%1\"";
 
-        static string CommandKeyValueValue => String.Format(CommandKeyValueFormat, "C:\\_Sciex\\CloudPlatform\\POC\\Native_Web_App_AuthN\\DesktopApp.RedirectCallBack\\bin\\Debug\\net6.0\\SciexOS.exe");
+        static string CommandKeyValueValue => String.Format(CommandKeyValueFormat, "C:\\_Sciex\\CloudPlatform\\POC\\One_Auth_Native_Web_Dunde\\DesktopApp.RedirectCallBack\\bin\\Debug\\net6.0\\SciexOS1.exe");
         //static string CommandKeyValueValue => String.Format(CommandKeyValueFormat, Assembly.GetExecutingAssembly().Location);
 
         const string UrlProtocolValueName = "URL Protocol";

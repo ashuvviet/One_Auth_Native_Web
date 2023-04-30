@@ -8,19 +8,30 @@ if (args.Any())
     await ProcessCallback(args[0]);
 }
 
+Console.ReadLine();
 
 static async Task ProcessCallback(string args)
 {
-    //Debugger.Launch();
-    var response = new AuthorizeResponse(args);
-    if (!String.IsNullOrWhiteSpace(response.State))
+    try
     {
-        Console.WriteLine($"Found state: {response.State}");
-        var callbackManager = new CallbackManager(response.State);
-        await callbackManager.RunClient(args);
+        //Debugger.Launch();
+        var response = new AuthorizeResponse(args);
+        if (!String.IsNullOrWhiteSpace(response.State))
+        {
+            Console.WriteLine($"Found state: {response.State}");
+            var callbackManager = new CallbackManager(response.State);
+            await callbackManager.RunClient(args);
+        }
+        else
+        {
+            Console.WriteLine("Error: no state on response");
+        }
     }
-    else
+    catch (Exception)
     {
-        Console.WriteLine("Error: no state on response");
+
+        
     }
+
+  
 }

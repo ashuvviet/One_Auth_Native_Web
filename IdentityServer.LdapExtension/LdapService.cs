@@ -56,7 +56,7 @@ namespace IdentityServer.LdapExtension
         {
             var searchResult = SearchUser(username, domain);
 
-            if (searchResult.Results.HasMore())
+            if (searchResult.Results != null && searchResult.Results.HasMore())
             {
                 try
                 {
@@ -113,26 +113,28 @@ namespace IdentityServer.LdapExtension
         public TUser FindUser(string username, string domain)
         {
             var searchResult = SearchUser(username, domain);
-
-            try
+            if (searchResult.Results != null)
             {
-                var user = searchResult.Results.Next();
-                if (user != null)
+                try
                 {
-                    //could change to ldap or change to configurable option
-                    var provider = !string.IsNullOrEmpty(domain) ? domain : "local";
-                    var appUser = new TUser();
-                    appUser.SetBaseDetails(user, provider, searchResult.config.ExtraAttributes);
+                    var user = searchResult.Results.Next();
+                    if (user != null)
+                    {
+                        //could change to ldap or change to configurable option
+                        var provider = !string.IsNullOrEmpty(domain) ? domain : "local";
+                        var appUser = new TUser();
+                        appUser.SetBaseDetails(user, provider, searchResult.config.ExtraAttributes);
 
-                    searchResult.LdapConnection.Disconnect();
+                        searchResult.LdapConnection.Disconnect();
 
-                    return appUser;
+                        return appUser;
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogTrace(default(EventId), e, e.Message);
-                // Swallow the exception since we don't expect an error from this method.
+                catch (Exception e)
+                {
+                    _logger.LogTrace(default(EventId), e, e.Message);
+                    // Swallow the exception since we don't expect an error from this method.
+                }
             }
 
             searchResult.LdapConnection.Disconnect();
@@ -188,9 +190,11 @@ namespace IdentityServer.LdapExtension
                 }
             }
 
-            throw new LoginFailedException(
-                    "Login failed.",
-                    new UserNotFoundException("User not found in any LDAP."));
+            return (null, null, null);
+
+            //throw new LoginFailedException(
+            //        "Login failed.",
+            //        new UserNotFoundException("User not found in any LDAP."));
         }
     }
 }

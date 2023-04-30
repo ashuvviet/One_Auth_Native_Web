@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <BaseOutputPath></BaseOutputPath>
-    <AssemblyName>SciexOS</AssemblyName>
+    <AssemblyName>SciexOS1</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
